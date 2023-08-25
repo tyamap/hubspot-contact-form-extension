@@ -18,8 +18,8 @@ const Options = () => {
         interactive: true
       },
       (responseUrl) => {
-        let url = new URL(responseUrl)
-        let code = url.searchParams.get("code")
+        const url = new URL(responseUrl)
+        const code = url.searchParams.get("code")
 
         const formData = new URLSearchParams()
         formData.append("grant_type", "authorization_code")
@@ -61,36 +61,37 @@ const Options = () => {
     // 現在の日時とアクセストークンの有効期限を比較して、有効かどうか判定
     // HubSpot のリフレッシュトークンは失効しない
     const isExpired = new Date() > new Date(tokens.expiredAt)
-    console.log("期限切れ？", isExpired)
 
-    const formData = new URLSearchParams()
-    formData.append("grant_type", "refresh_token")
-    formData.append("client_id", process.env.PLASMO_PUBLIC_HUBSPOT_CLIENT_ID)
-    formData.append(
-      "client_secret",
-      process.env.PLASMO_PUBLIC_HUBSPOT_CLIENT_SECRET
-    )
-    formData.append("refresh_token", tokens.refreshToken)
-    fetch("https://api.hubapi.com/oauth/v1/token", {
-      method: "post",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: formData
-    })
-      .then((res) => res.json())
-      .then((json) => {
-        const refreshToken = json["refresh_token"]
-        const accessToken = json["access_token"]
-        const expiresIn = json["expires_in"]
-        // トークン期限を設定
-        const expiredAt = expiresIn
-          ? new Date(new Date().getTime() + expiresIn * 1000)
-          : new Date()
-        setTokens({
-          refreshToken,
-          accessToken,
-          expiredAt: expiredAt.toString()
-        })
+    if (isExpired) {
+      const formData = new URLSearchParams()
+      formData.append("grant_type", "refresh_token")
+      formData.append("client_id", process.env.PLASMO_PUBLIC_HUBSPOT_CLIENT_ID)
+      formData.append(
+        "client_secret",
+        process.env.PLASMO_PUBLIC_HUBSPOT_CLIENT_SECRET
+      )
+      formData.append("refresh_token", tokens.refreshToken)
+      fetch("https://api.hubapi.com/oauth/v1/token", {
+        method: "post",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: formData
       })
+        .then((res) => res.json())
+        .then((json) => {
+          const refreshToken = json["refresh_token"]
+          const accessToken = json["access_token"]
+          const expiresIn = json["expires_in"]
+          // トークン期限を設定
+          const expiredAt = expiresIn
+            ? new Date(new Date().getTime() + expiresIn * 1000)
+            : new Date()
+          setTokens({
+            refreshToken,
+            accessToken,
+            expiredAt: expiredAt.toString()
+          })
+        })
+    }
   }
 
   return (
