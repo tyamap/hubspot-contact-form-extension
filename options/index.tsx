@@ -11,23 +11,33 @@ const Options = () => {
         let url = new URL(responseUrl)
         let code = url.searchParams.get("code")
 
+        const formData = new URLSearchParams()
+        formData.append("grant_type", "authorization_code")
+        formData.append(
+          "client_id",
+          process.env.PLASMO_PUBLIC_HUBSPOT_CLIENT_ID
+        )
+        formData.append(
+          "client_secret",
+          process.env.PLASMO_PUBLIC_HUBSPOT_CLIENT_SECRET
+        )
+        formData.append(
+          "redirect_uri",
+          process.env.PLASMO_PUBLIC_HUBSPOT_REDIRECT_URL
+        )
+        formData.append("code", code)
+
         fetch("https://api.hubapi.com/oauth/v1/token", {
           method: "post",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            grant_type: "authorization_code",
-            client_id: process.env.PLASMO_PUBLIC_HUBSPOT_CLIENT_ID,
-            client_secret: process.env.PLASMO_PUBLIC_HUBSPOT_CLIENT_SECRET,
-            redirect_uri: process.env.PLASMO_PUBLIC_HUBSPOT_REDIRECT_URL,
-            code: code
-          })
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: formData
         })
           .then((res) => res.json())
           .then((json) => {
-            const token = json["token"] // アクセストークン取得
-            alert(token)
+            const refreshToken = json["refresh_token"]
+            const accessToken = json["access_token"]
+            console.log(refreshToken)
+            console.log(accessToken)
           })
       }
     )
