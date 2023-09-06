@@ -65,7 +65,10 @@ const sideform = () => {
   return (
     show &&
     <div className="fixed top-0 right-0 bg-white w-96 h-full drop-shadow-2xl">
-      <div className="p-4 bg-orange-500 text-white">コンタクトを作成</div>
+      <div className="p-4 bg-orange-500 text-white flex justify-between">
+        <text>コンタクトを作成</text>
+        <button onClick={() => setShow(false)}>X</button>
+      </div>
       <div className="p-4">
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className={blockStyle}>
@@ -97,7 +100,7 @@ const sideform = () => {
             <label className={labelStyle} htmlFor="lifecyclestage">Lifecyclestage</label>
             <input className={inputStyle} type="text" {...register("lifecyclestage")} />
           </div>
-          <input className="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded" type="submit" />
+          <input className="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded float-right" type="submit" />
         </form>
       </div>
     </div>

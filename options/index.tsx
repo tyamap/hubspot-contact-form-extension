@@ -1,6 +1,5 @@
 import axios from "axios";
 import { useStorage } from "@plasmohq/storage/hook"
-import "~/style.css"
 import type { Tokens } from "~entities/tokens";
 
 const Options = () => {
