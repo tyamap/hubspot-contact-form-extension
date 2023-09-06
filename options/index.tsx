@@ -1,3 +1,4 @@
+import axios from "axios";
 import { useStorage } from "@plasmohq/storage/hook"
 
 type Tokens = {
@@ -12,12 +13,16 @@ const Options = () => {
   const [tokens, setTokens] = useStorage<Tokens>("tokens")
 
   const handleClickAuth = () => {
+    // 自身のChrome拡張IDを含んだURLをリダイレクト先とする
+    const redirectUrl = `https://${chrome.runtime.id}.chromiumapp.org`
+    console.log(`https://app.hubspot.com/oauth/authorize?client_id=${process.env.PLASMO_PUBLIC_HUBSPOT_CLIENT_ID}&redirect_uri=${redirectUrl}&scope=${HUBSPOT_SCOPE}`)
     chrome.identity.launchWebAuthFlow(
       {
-        url: `https://app.hubspot.com/oauth/authorize?client_id=${process.env.PLASMO_PUBLIC_HUBSPOT_CLIENT_ID}&redirect_uri=${process.env.PLASMO_PUBLIC_HUBSPOT_REDIRECT_URL}&scope=${HUBSPOT_SCOPE}`,
+        url: `https://app.hubspot.com/oauth/authorize?client_id=${process.env.PLASMO_PUBLIC_HUBSPOT_CLIENT_ID}&redirect_uri=${redirectUrl}&scope=${HUBSPOT_SCOPE}`,
         interactive: true
       },
       (responseUrl) => {
+        console.log(responseUrl)
         const url = new URL(responseUrl)
         const code = url.searchParams.get("code")
 
@@ -31,18 +36,14 @@ const Options = () => {
           "client_secret",
           process.env.PLASMO_PUBLIC_HUBSPOT_CLIENT_SECRET
         )
-        formData.append("code", code)
+        formData.append("redirect_uri", redirectUrl),
+          formData.append("code", code)
 
-        fetch("https://api.hubapi.com/oauth/v1/token", {
-          method: "post",
-          headers: { "Content-Type": "application/x-www-form-urlencoded" },
-          body: formData
-        })
-          .then((res) => res.json())
-          .then((json) => {
-            const refreshToken = json["refresh_token"]
-            const accessToken = json["access_token"]
-            const expiresIn = json["expires_in"]
+        axios.post("https://api.hubapi.com/oauth/v1/token", formData)
+          .then((res) => {
+            const refreshToken = res["refresh_token"]
+            const accessToken = res["access_token"]
+            const expiresIn = res["expires_in"]
             // トークン期限を設定
             const expiredAt = expiresIn
               ? new Date(new Date().getTime() + expiresIn * 1000)
@@ -71,16 +72,11 @@ const Options = () => {
         process.env.PLASMO_PUBLIC_HUBSPOT_CLIENT_SECRET
       )
       formData.append("refresh_token", tokens.refreshToken)
-      fetch("https://api.hubapi.com/oauth/v1/token", {
-        method: "post",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: formData
-      })
-        .then((res) => res.json())
-        .then((json) => {
-          const refreshToken = json["refresh_token"]
-          const accessToken = json["access_token"]
-          const expiresIn = json["expires_in"]
+      axios.post("https://api.hubapi.com/oauth/v1/token", formData)
+        .then((res) => {
+          const refreshToken = res["refresh_token"]
+          const accessToken = res["access_token"]
+          const expiresIn = res["expires_in"]
           // トークン期限を設定
           const expiredAt = expiresIn
             ? new Date(new Date().getTime() + expiresIn * 1000)
