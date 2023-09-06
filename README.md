@@ -1,3 +1,9 @@
+# Sidespot
+
+見込み顧客の企業情報などからコンタクトデータを作成する作業を効率化する Chrome 拡張機能
+
+Chrome extension that streamlines the process of creating contact data from a prospective customer's company information, etc.
+
 This is a [Plasmo extension](https://docs.plasmo.com/) project bootstrapped with [`plasmo init`](https://www.npmjs.com/package/plasmo).
 
 ## Getting Started

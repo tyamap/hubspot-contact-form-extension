@@ -1,8 +1,8 @@
 {
-  "name": "hubspot-contact-form-extension",
+  "name": "sidespot-",
   "displayName": "Hubspot contact form extension",
   "version": "0.0.1",
-  "description": "HubSpot Contact form helper",
+  "description": "Chrome extension that streamlines the process of creating contact data from a prospective customer's company information, etc.",
   "author": "tyamap",
   "scripts": {
     "dev": "plasmo dev",
