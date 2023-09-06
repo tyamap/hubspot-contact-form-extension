@@ -15,14 +15,12 @@ const Options = () => {
   const handleClickAuth = () => {
     // 自身のChrome拡張IDを含んだURLをリダイレクト先とする
     const redirectUrl = `https://${chrome.runtime.id}.chromiumapp.org`
-    console.log(`https://app.hubspot.com/oauth/authorize?client_id=${process.env.PLASMO_PUBLIC_HUBSPOT_CLIENT_ID}&redirect_uri=${redirectUrl}&scope=${HUBSPOT_SCOPE}`)
     chrome.identity.launchWebAuthFlow(
       {
         url: `https://app.hubspot.com/oauth/authorize?client_id=${process.env.PLASMO_PUBLIC_HUBSPOT_CLIENT_ID}&redirect_uri=${redirectUrl}&scope=${HUBSPOT_SCOPE}`,
         interactive: true
       },
       (responseUrl) => {
-        console.log(responseUrl)
         const url = new URL(responseUrl)
         const code = url.searchParams.get("code")
 
@@ -41,9 +39,9 @@ const Options = () => {
 
         axios.post("https://api.hubapi.com/oauth/v1/token", formData)
           .then((res) => {
-            const refreshToken = res["refresh_token"]
-            const accessToken = res["access_token"]
-            const expiresIn = res["expires_in"]
+            const refreshToken = res.data["refresh_token"]
+            const accessToken = res.data["access_token"]
+            const expiresIn = res.data["expires_in"]
             // トークン期限を設定
             const expiredAt = expiresIn
               ? new Date(new Date().getTime() + expiresIn * 1000)
@@ -74,9 +72,9 @@ const Options = () => {
       formData.append("refresh_token", tokens.refreshToken)
       axios.post("https://api.hubapi.com/oauth/v1/token", formData)
         .then((res) => {
-          const refreshToken = res["refresh_token"]
-          const accessToken = res["access_token"]
-          const expiresIn = res["expires_in"]
+          const refreshToken = res.data["refresh_token"]
+          const accessToken = res.data["access_token"]
+          const expiresIn = res.data["expires_in"]
           // トークン期限を設定
           const expiredAt = expiresIn
             ? new Date(new Date().getTime() + expiresIn * 1000)
