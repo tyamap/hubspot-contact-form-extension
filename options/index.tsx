@@ -1,11 +1,7 @@
 import axios from "axios";
 import { useStorage } from "@plasmohq/storage/hook"
-
-type Tokens = {
-  accessToken?: string
-  refreshToken?: string
-  expiredAt?: string
-}
+import "~/style.css"
+import type { Tokens } from "~entities/tokens";
 
 const Options = () => {
   const HUBSPOT_SCOPE = "crm.objects.contacts.read%20crm.objects.contacts.write"
@@ -88,6 +84,17 @@ const Options = () => {
     }
   }
 
+  const getContacts = () => {
+    const url = "https://api.hubapi.com/crm/v3/objects/contacts"
+    const headers = {
+      Authorization: `Bearer ${tokens.accessToken}`
+    }
+    axios.get(url, { headers })
+      .then((res) => {
+        console.log(res.data.results)
+      })
+  }
+
   return (
     <div
       style={{
@@ -97,6 +104,7 @@ const Options = () => {
       }}>
       <button onClick={handleClickRefresh}>トークンリフレッシュ</button>
       <button onClick={handleClickAuth}>HubSpot認証</button>
+      <button onClick={getContacts}>コンタクト取得</button>
       <ul>
         <li>access_token: {tokens?.accessToken}</li>
         <li>refresh_token: {tokens?.refreshToken}</li>

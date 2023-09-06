@@ -1,6 +1,13 @@
+import { sendToContentScript } from "@plasmohq/messaging"
+
 const Popup = () => {
   const openOptionPage = () => {
     chrome.runtime.openOptionsPage()
+  }
+  const showSideform = async () => {
+    await sendToContentScript({
+      name: "toggleSideform"
+    })
   }
 
   return (
@@ -12,6 +19,7 @@ const Popup = () => {
         width: 260
       }}>
       <button onClick={openOptionPage}>設定</button>
+      <button onClick={showSideform}>起動</button>
     </div>
   )
 }
