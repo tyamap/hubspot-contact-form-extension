@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useStorage } from "@plasmohq/storage/hook"
+import { useStorage } from "@plasmohq/storage/hook";
 import type { Tokens } from "~entities/tokens";
 
 const Options = () => {
@@ -9,7 +9,7 @@ const Options = () => {
 
   const handleClickAuth = () => {
     // 自身のChrome拡張IDを含んだURLをリダイレクト先とする
-    const redirectUrl = `https://${chrome.runtime.id}.chromiumapp.org`
+    const redirectUrl = chrome.identity.getRedirectURL("oauth2")
     chrome.identity.launchWebAuthFlow(
       {
         url: `https://app.hubspot.com/oauth/authorize?client_id=${process.env.PLASMO_PUBLIC_HUBSPOT_CLIENT_ID}&redirect_uri=${redirectUrl}&scope=${HUBSPOT_SCOPE}`,
@@ -32,7 +32,8 @@ const Options = () => {
         formData.append("redirect_uri", redirectUrl),
           formData.append("code", code)
 
-        axios.post("https://api.hubapi.com/oauth/v1/token", formData)
+        axios
+          .post("https://api.hubapi.com/oauth/v1/token", formData)
           .then((res) => {
             const refreshToken = res.data["refresh_token"]
             const accessToken = res.data["access_token"]
@@ -65,7 +66,8 @@ const Options = () => {
         process.env.PLASMO_PUBLIC_HUBSPOT_CLIENT_SECRET
       )
       formData.append("refresh_token", tokens.refreshToken)
-      axios.post("https://api.hubapi.com/oauth/v1/token", formData)
+      axios
+        .post("https://api.hubapi.com/oauth/v1/token", formData)
         .then((res) => {
           const refreshToken = res.data["refresh_token"]
           const accessToken = res.data["access_token"]
@@ -88,10 +90,9 @@ const Options = () => {
     const headers = {
       Authorization: `Bearer ${tokens.accessToken}`
     }
-    axios.get(url, { headers })
-      .then((res) => {
-        console.log(res.data.results)
-      })
+    axios.get(url, { headers }).then((res) => {
+      console.log(res.data.results)
+    })
   }
 
   return (
