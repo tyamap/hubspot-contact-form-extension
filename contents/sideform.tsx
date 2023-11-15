@@ -1,12 +1,22 @@
-import { useMessage } from "@plasmohq/messaging/hook"
-import type { PlasmoCSConfig } from "plasmo"
-import cssText from "data-text:~style.css"
-import { useState } from "react"
-import { useForm } from "react-hook-form";
 import { type } from "os";
-import { useStorage } from "@plasmohq/storage/hook";
-import type { Tokens } from "~entities/tokens";
 import axios from "axios";
+import cssText from "data-text:~style.css";
+import type { PlasmoCSConfig } from "plasmo";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+
+
+
+import { useMessage } from "@plasmohq/messaging/hook";
+import { useStorage } from "@plasmohq/storage/hook";
+
+
+
+import type { Tokens } from "~entities/tokens";
+
+
+
+
 
 export const getStyle = () => {
   const style = document.createElement("style")
@@ -43,22 +53,20 @@ const sideform = () => {
   })
 
   const onSubmit = (data: ContactInputs) => {
-    console.log(data)
     createContact({ properties: data })
   };
   // コンタクトの作成
   const createContact = (formData) => {
-    const url = "https://api.hubapi.com/crm/v3/objects/contacts"
+    const url = "http://localhost:3000/api/v1/create-contact"
     const headers = {
-      Authorization: `Bearer ${tokens.accessToken}`,
-      'content-type': 'application/json',
-      'Access-Control-Allow-Origin': "*"
+      // CORS対策
+      // Authorization: `Bearer ${tokens.accessToken}`,
+      "Content-Type": "text/plain"
     }
-    const data = { properties: formData }
-    axios.post(url, data, { headers })
-      .then((res) => {
-        console.log(res.data.results)
-      })
+    const data = { properties: formData, accessToken: tokens.accessToken }
+    axios.post(url, data, { headers, withCredentials: true }).then((res) => {
+      console.log(res.data.results)
+    })
   }
 
 
