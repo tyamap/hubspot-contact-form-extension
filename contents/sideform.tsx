@@ -53,18 +53,16 @@ const sideform = () => {
   })
 
   const onSubmit = (data: ContactInputs) => {
-    createContact({ properties: data })
+    createContact( data )
   };
   // コンタクトの作成
   const createContact = (formData) => {
     const url = "http://localhost:3000/api/v1/create-contact"
     const headers = {
-      // CORS対策
-      // Authorization: `Bearer ${tokens.accessToken}`,
-      "Content-Type": "text/plain"
+      "Content-Type": "application/json"
     }
     const data = { properties: formData, accessToken: tokens.accessToken }
-    axios.post(url, data, { headers, withCredentials: true }).then((res) => {
+    axios.post(url, data, { headers }).then((res) => {
       console.log(res.data.results)
     })
   }
