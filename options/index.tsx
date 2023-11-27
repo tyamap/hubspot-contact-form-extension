@@ -1,6 +1,9 @@
-import axios from "axios";
-import { useStorage } from "@plasmohq/storage/hook";
-import type { Tokens } from "~entities/tokens";
+import axios from "axios"
+
+import { useStorage } from "@plasmohq/storage/hook"
+
+import type { Tokens } from "~entities/tokens"
+import { refreshAuthToken } from "~lib/auth"
 
 const Options = () => {
   const HUBSPOT_SCOPE = "crm.objects.contacts.read%20crm.objects.contacts.write"
@@ -58,41 +61,10 @@ const Options = () => {
     const isExpired = new Date() > new Date(tokens.expiredAt)
 
     if (isExpired) {
-      const formData = new URLSearchParams()
-      formData.append("grant_type", "refresh_token")
-      formData.append("client_id", process.env.PLASMO_PUBLIC_HUBSPOT_CLIENT_ID)
-      formData.append(
-        "client_secret",
-        process.env.PLASMO_PUBLIC_HUBSPOT_CLIENT_SECRET
-      )
-      formData.append("refresh_token", tokens.refreshToken)
-      axios
-        .post("https://api.hubapi.com/oauth/v1/token", formData)
-        .then((res) => {
-          const refreshToken = res.data["refresh_token"]
-          const accessToken = res.data["access_token"]
-          const expiresIn = res.data["expires_in"]
-          // トークン期限を設定
-          const expiredAt = expiresIn
-            ? new Date(new Date().getTime() + expiresIn * 1000)
-            : new Date()
-          setTokens({
-            refreshToken,
-            accessToken,
-            expiredAt: expiredAt.toString()
-          })
-        })
+      refreshAuthToken(tokens.refreshToken).then((tokens) => {
+        setTokens(tokens)
+      })
     }
-  }
-
-  const getContacts = () => {
-    const url = "https://api.hubapi.com/crm/v3/objects/contacts"
-    const headers = {
-      Authorization: `Bearer ${tokens.accessToken}`
-    }
-    axios.get(url, { headers }).then((res) => {
-      console.log(res.data.results)
-    })
   }
 
   return (
@@ -102,14 +74,11 @@ const Options = () => {
         flexDirection: "column",
         padding: 16
       }}>
-      <button onClick={handleClickRefresh}>トークンリフレッシュ</button>
-      <button onClick={handleClickAuth}>HubSpot認証</button>
-      <button onClick={getContacts}>コンタクト取得</button>
-      <ul>
-        <li>access_token: {tokens?.accessToken}</li>
-        <li>refresh_token: {tokens?.refreshToken}</li>
-        <li>expired_at: {tokens?.expiredAt}</li>
-      </ul>
+      {tokens?.refreshToken ? (
+        <div>認証済み</div>
+        ) : (
+        <button onClick={handleClickAuth}>HubSpot認証</button>
+      )}
     </div>
   )
 }
