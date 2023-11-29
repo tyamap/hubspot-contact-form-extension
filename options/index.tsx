@@ -3,7 +3,6 @@ import axios from "axios"
 import { useStorage } from "@plasmohq/storage/hook"
 
 import type { Tokens } from "~entities/tokens"
-import { refreshAuthToken } from "~lib/auth"
 
 const Options = () => {
   const HUBSPOT_SCOPE = "crm.objects.contacts.read%20crm.objects.contacts.write"
@@ -53,18 +52,6 @@ const Options = () => {
           })
       }
     )
-  }
-
-  const handleClickRefresh = () => {
-    // 現在の日時とアクセストークンの有効期限を比較して、有効かどうか判定
-    // HubSpot のリフレッシュトークンは失効しない
-    const isExpired = new Date() > new Date(tokens.expiredAt)
-
-    if (isExpired) {
-      refreshAuthToken(tokens.refreshToken).then((tokens) => {
-        setTokens(tokens)
-      })
-    }
   }
 
   return (

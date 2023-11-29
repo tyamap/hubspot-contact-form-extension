@@ -72,9 +72,10 @@ const Sideform = () => {
       if (res.status === 201) {
         alert("登録しました")
         setShow(false)
+      } else {
+        alert("登録に失敗しました")
       }
     }).catch((e) => { 
-      alert("登録に失敗しました")
       console.error(e)
     })
   }
