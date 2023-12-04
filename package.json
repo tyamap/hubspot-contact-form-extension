@@ -36,7 +36,8 @@
     ],
     "permissions": [
       "identity",
-      "scripting"
+      "scripting",
+      "activeTab"
     ]
   }
 }
