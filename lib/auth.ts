@@ -6,9 +6,9 @@ export const refreshAuthToken = (refreshToken) => {
   return axios
     .post(url, { refresh_token: refreshToken })
     .then((res) => {
-      const refreshToken = res.data["refresh_token"]
-      const accessToken = res.data["access_token"]
-      const expiresIn = res.data["expires_in"]
+      const refreshToken = res.data["refreshToken"]
+      const accessToken = res.data["accessToken"]
+      const expiresIn = res.data["expiresIn"]
       // トークン期限を設定
       const expiredAt = expiresIn
         ? new Date(new Date().getTime() + expiresIn * 1000)
