@@ -63,7 +63,8 @@ const Sideform = () => {
 
   // コンタクトの作成
   const createContact = (formData, accessToken: string) => {
-    const url = "http://localhost:3000/api/v1/create-contact"
+    setLoading(true)
+    const url = `${process.env.PLASMO_PUBLIC_API_ROOT}/api/v1/create-contact`
     const headers = {
       "Content-Type": "application/json"
     }

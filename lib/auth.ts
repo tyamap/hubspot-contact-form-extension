@@ -1,7 +1,7 @@
 import axios from "axios"
 
 export const refreshAuthToken = (refreshToken) => {
-  const url = "http://localhost:3000/api/v1/refresh-token"
+  const url = `${process.env.PLASMO_PUBLIC_API_ROOT}/api/v1/refresh-token`
   console.log(url, { refresh_token: refreshToken })
   return axios
     .post(url, { refresh_token: refreshToken })
