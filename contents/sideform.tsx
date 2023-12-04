@@ -1,14 +1,22 @@
-import axios from "axios"
-import cssText from "data-text:~style.css"
-import type { PlasmoCSConfig } from "plasmo"
-import { useState } from "react"
-import { useForm } from "react-hook-form"
+import axios from "axios";
+import cssText from "data-text:~style.css";
+import type { PlasmoCSConfig } from "plasmo";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
 
-import { useMessage } from "@plasmohq/messaging/hook"
-import { useStorage } from "@plasmohq/storage/hook"
 
-import type { Tokens } from "~entities/tokens"
-import { refreshAuthToken } from "~lib/auth"
+
+import { useMessage } from "@plasmohq/messaging/hook";
+import { useStorage } from "@plasmohq/storage/hook";
+
+
+
+import type { Tokens } from "~entities/tokens";
+import { refreshAuthToken } from "~lib/auth";
+
+
+
+
 
 export const getStyle = () => {
   const style = document.createElement("style")
@@ -37,10 +45,12 @@ const Sideform = () => {
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors }
   } = useForm<ContactInputs>()
   const [tokens, setTokens] = useStorage<Tokens>("tokens")
-
+  const [loading, setLoading] = useState(false)
+  
   // ポップアップのボタンをトリガーにサイドフォームの表示切り替え
   useMessage(async (req, _res) => {
     if (req.name === "toggleSideform") {
@@ -71,12 +81,16 @@ const Sideform = () => {
     const data = { properties: formData, accessToken: accessToken }
     axios.post(url, data, { headers }).then((res) => {
       if (res.status === 201) {
+        setLoading(false)
         alert("登録しました")
+        reset()
         setShow(false)
       } else {
+        setLoading(false)
         alert("登録に失敗しました")
       }
     }).catch((e) => { 
+      setLoading(false)
       console.error(e)
     })
   }
@@ -165,7 +179,7 @@ const Sideform = () => {
                 </div>
                 <input
                   className="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded float-right"
-                  type="submit"
+                  type="submit" disabled={loading}
                 />
               </form>
             </div>
