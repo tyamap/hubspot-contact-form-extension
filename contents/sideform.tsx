@@ -118,18 +118,8 @@ const Sideform = () => {
                   {errors.email && <span>This field is required</span>}
                 </div>
                 <div className={blockStyle}>
-                  <label className={labelStyle} htmlFor="firstname">
-                    First Name
-                  </label>
-                  <input
-                    className={inputStyle}
-                    type="text"
-                    {...register("firstname")}
-                  />
-                </div>
-                <div className={blockStyle}>
                   <label className={labelStyle} htmlFor="lastname">
-                    Last Name
+                    姓
                   </label>
                   <input
                     className={inputStyle}
@@ -138,8 +128,18 @@ const Sideform = () => {
                   />
                 </div>
                 <div className={blockStyle}>
+                  <label className={labelStyle} htmlFor="firstname">
+                    名
+                  </label>
+                  <input
+                    className={inputStyle}
+                    type="text"
+                    {...register("firstname")}
+                  />
+                </div>
+                <div className={blockStyle}>
                   <label className={labelStyle} htmlFor="phone">
-                    Phone
+                    電話番号
                   </label>
                   <input
                     className={inputStyle}
@@ -149,7 +149,7 @@ const Sideform = () => {
                 </div>
                 <div className={blockStyle}>
                   <label className={labelStyle} htmlFor="company">
-                    Company
+                    会社名
                   </label>
                   <input
                     className={inputStyle}
@@ -165,16 +165,6 @@ const Sideform = () => {
                     className={inputStyle}
                     type="text"
                     {...register("website")}
-                  />
-                </div>
-                <div className={blockStyle}>
-                  <label className={labelStyle} htmlFor="lifecyclestage">
-                    Lifecyclestage
-                  </label>
-                  <input
-                    className={inputStyle}
-                    type="text"
-                    {...register("lifecyclestage")}
                   />
                 </div>
                 <input
