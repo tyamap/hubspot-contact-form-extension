@@ -1,13 +1,16 @@
 import axios from "axios"
+import { useState } from "react"
 
 import { useStorage } from "@plasmohq/storage/hook"
 
 import type { Tokens } from "~entities/tokens"
+import { refreshAuthToken } from "~lib/auth"
 
 const Options = () => {
   const HUBSPOT_SCOPE = "crm.objects.contacts.read%20crm.objects.contacts.write"
 
   const [tokens, setTokens] = useStorage<Tokens>("tokens")
+  const [properties, setProperties] = useState<Property[]>([])
 
   const handleClickAuth = () => {
     // 自身のChrome拡張IDを含んだURLをリダイレクト先とする
@@ -54,6 +57,37 @@ const Options = () => {
     )
   }
 
+  const onClick = () => {
+    const isExpired = new Date() > new Date(tokens.expiredAt)
+
+    if (isExpired) {
+      refreshAuthToken(tokens.refreshToken).then((tokens) => {
+        setTokens(tokens)
+        getProperties(tokens.accessToken)
+      })
+    } else {
+      getProperties(tokens.accessToken)
+    }
+  }
+
+  // コンタクトの作成
+  const getProperties = (accessToken: string) => {
+    const url = `${process.env.PLASMO_PUBLIC_API_ROOT}/api/v1/get-properties`
+    const headers = {
+      "Content-Type": "application/json"
+    }
+    const data = { accessToken: accessToken }
+    axios
+      .post(url, data, { headers })
+      .then((res) => {
+        console.log(res)
+        setProperties(res.data.results)
+      })
+      .catch((e) => {
+        console.error(e)
+      })
+  }
+
   return (
     <div
       style={{
@@ -62,8 +96,19 @@ const Options = () => {
         padding: 16
       }}>
       {tokens?.refreshToken ? (
-        <div>認証済み</div>
-        ) : (
+        <div>
+          <div>認証済み</div>
+          <button onClick={onClick}>プロパティー取得</button>
+          <table>
+            {properties.map((prop) => (
+              <tr key={prop.name}>
+                <td>{prop.label}</td>
+                <td>{prop.name}</td>
+              </tr>
+            ))}
+          </table>
+        </div>
+      ) : (
         <button onClick={handleClickAuth}>HubSpot認証</button>
       )}
     </div>
