@@ -2,6 +2,7 @@ import "~/style.css"
 
 import axios from "axios"
 import { useState } from "react"
+import { useForm } from "react-hook-form"
 
 import { useStorage } from "@plasmohq/storage/hook"
 
@@ -16,7 +17,12 @@ const Options = () => {
   const HUBSPOT_SCOPE = "crm.objects.contacts.read%20crm.objects.contacts.write"
 
   const [tokens, setTokens] = useStorage<Tokens>("tokens")
+  const [propertySettings, setPropertySettings] =
+    useStorage<Property[]>("PropertySettings")
   const [propertyGroups, setPropertyGroups] = useState<PropertyGroup>({})
+  const [properties, setProperties] = useState<Property[]>([])
+  const [settingProgress, setSettingProgress] = useState<boolean>(false)
+  const propsSelectForm = useForm<{ props: string[] }>()
 
   const handleClickAuth = () => {
     // 自身のChrome拡張IDを含んだURLをリダイレクト先とする
@@ -88,6 +94,7 @@ const Options = () => {
       .then((res) => {
         console.log(res)
 
+        setProperties(res.data.results)
         const result = res.data.results.reduce((group, p) => {
           group[p.groupName] = group[p.groupName] ?? []
           group[p.groupName].push(p)
@@ -95,10 +102,19 @@ const Options = () => {
         }, {})
         console.log(result)
         setPropertyGroups(result)
+        setSettingProgress(true)
       })
       .catch((e) => {
         console.error(e)
       })
+  }
+
+  const onSubmit = (data) => {
+    const selectedProps = properties.filter((prop) =>
+      data.props.includes(prop.name)
+    )
+    console.log(selectedProps)
+    setPropertySettings(selectedProps)
   }
 
   return (
@@ -110,30 +126,56 @@ const Options = () => {
       }}>
       {tokens?.refreshToken ? (
         <div>
-          <div>認証済み</div>
-          <button
-            onClick={onClick}
-            className="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded mb-4">
-            プロパティー取得
-          </button>
-          <div className="max-w-4xl m-auto">
-            {Object.keys(propertyGroups).map((groupName) => (
-              <div key={groupName || "no_group"}>
-                <h2 className="text-lg font-bold mb-2">{groupName || "no_group"}</h2>
-                <div className="flex flex-wrap">
-                  {propertyGroups[groupName].map((prop) => (
-                    <div key={prop.name} className="w-1/2 mb-4">
-                      <label>
-                        <input type="checkbox" className="align-[-2px] mr-1" />
-                        <span className="font-bold">{prop.label}</span>
-                      </label>
-                      <p className="pl-4 pr-4">{prop.description}</p>
+          <div className="text-center">認証済み</div>
+          {propertySettings && (
+            <>
+              <h2>選択済プロパティー</h2>
+              <ul>
+                {propertySettings.map((prop) => (
+                  <li key={prop.name}>{prop.label}</li>
+                ))}
+              </ul>
+            </>
+          )}
+          {settingProgress ? (
+            <div className="max-w-4xl m-auto">
+              <form onSubmit={propsSelectForm.handleSubmit(onSubmit)}>
+                <input
+                  type="submit"
+                  className="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded mb-4"
+                />
+                {Object.keys(propertyGroups).map((groupName) => (
+                  <div key={groupName || "no_group"}>
+                    <h2 className="text-lg font-bold mb-2">
+                      {groupName || "no_group"}
+                    </h2>
+                    <div className="flex flex-wrap">
+                      {propertyGroups[groupName].map((prop) => (
+                        <div key={prop.name} className="w-1/2 mb-4">
+                          <label>
+                            <input
+                              type="checkbox"
+                              className="align-[-2px] mr-1"
+                              value={prop.name}
+                              {...propsSelectForm.register("props")}
+                            />
+                            <span className="font-bold">{prop.label}</span>
+                          </label>
+                          <p className="pl-4 pr-4">{prop.description}</p>
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
+                  </div>
+                ))}
+              </form>
+            </div>
+          ) : (
+            <button
+              onClick={onClick}
+              className="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded mb-4">
+              プロパティー取得
+            </button>
+          )}
         </div>
       ) : (
         <button onClick={handleClickAuth}>HubSpot認証</button>
