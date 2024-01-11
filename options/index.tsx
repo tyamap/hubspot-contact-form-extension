@@ -1,13 +1,26 @@
-import "~/style.css"
 
-import axios from "axios"
-import { useState } from "react"
-import { useForm } from "react-hook-form"
 
-import { useStorage } from "@plasmohq/storage/hook"
 
-import type { Tokens } from "~entities/tokens"
-import { refreshAuthToken } from "~lib/auth"
+import "~/style.css";
+
+
+
+import axios from "axios";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+
+
+
+import { useStorage } from "@plasmohq/storage/hook";
+
+
+
+import type { Tokens } from "~entities/tokens";
+import { refreshAuthToken } from "~lib/auth";
+
+
+
+
 
 type PropertyGroup = {
   [groupName: string]: Property[]
@@ -93,9 +106,16 @@ const Options = () => {
       .post(url, data, { headers })
       .then((res) => {
         console.log(res)
+        // テキストタイプのみに絞り込み
+        const results = res.data.results
+          .filter(
+            (result) =>
+              ["string", "number"].includes(result.type) &&
+              !["lastname", "firstname", "email"].includes(result.label)
+          )
 
-        setProperties(res.data.results)
-        const result = res.data.results.reduce((group, p) => {
+        setProperties(results)
+        const result = results.reduce((group, p) => {
           group[p.groupName] = group[p.groupName] ?? []
           group[p.groupName].push(p)
           return group
@@ -114,6 +134,11 @@ const Options = () => {
       data.props.includes(prop.name)
     )
     console.log(selectedProps)
+    if (selectedProps.length > 7) {
+      alert(
+        `設定できるプロパティーは7個までです。\n選択中: ${selectedProps.length}`
+      )
+    }
     setPropertySettings(selectedProps)
   }
 
@@ -137,13 +162,19 @@ const Options = () => {
               </ul>
             </>
           )}
-          {settingProgress ? (
-            <div className="max-w-4xl m-auto">
+          <div className="max-w-4xl m-auto">
+            {settingProgress ? (
               <form onSubmit={propsSelectForm.handleSubmit(onSubmit)}>
                 <input
                   type="submit"
+                  value="保存"
                   className="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded mb-4"
                 />
+                <p>
+                  使用するプロパティーを7個まで選択できます。
+                  <br />
+                  現在設定できるのは文字列・数値タイプのプロパティーのみです🙇‍♂️
+                </p>
                 {Object.keys(propertyGroups).map((groupName) => (
                   <div key={groupName || "no_group"}>
                     <h2 className="text-lg font-bold mb-2">
@@ -158,6 +189,9 @@ const Options = () => {
                               className="align-[-2px] mr-1"
                               value={prop.name}
                               {...propsSelectForm.register("props")}
+                              defaultChecked={propertySettings
+                                .map((p) => p.name)
+                                .includes(prop.name)}
                             />
                             <span className="font-bold">{prop.label}</span>
                           </label>
@@ -168,14 +202,14 @@ const Options = () => {
                   </div>
                 ))}
               </form>
-            </div>
-          ) : (
-            <button
-              onClick={onClick}
-              className="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded mb-4">
-              プロパティー取得
-            </button>
-          )}
+            ) : (
+              <button
+                onClick={onClick}
+                className="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded mb-4">
+                プロパティーを設定
+              </button>
+            )}
+          </div>
         </div>
       ) : (
         <button onClick={handleClickAuth}>HubSpot認証</button>

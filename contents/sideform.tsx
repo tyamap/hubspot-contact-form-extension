@@ -34,10 +34,7 @@ type ContactInputs = {
   email: string
   firstname: string
   lastname: string
-  phone?: string
-  company?: string
-  website?: string
-  lifecyclestage?: string
+  [key: string]: string
 }
 
 const Sideform = () => {
@@ -49,8 +46,9 @@ const Sideform = () => {
     formState: { errors }
   } = useForm<ContactInputs>()
   const [tokens, setTokens] = useStorage<Tokens>("tokens")
+  const [propertySettings] = useStorage<Property[]>("PropertySettings")
   const [loading, setLoading] = useState(false)
-  
+
   // ポップアップのボタンをトリガーにサイドフォームの表示切り替え
   useMessage(async (req, _res) => {
     if (req.name === "toggleSideform") {
@@ -79,25 +77,28 @@ const Sideform = () => {
       "Content-Type": "application/json"
     }
     const data = { properties: formData, accessToken: accessToken }
-    axios.post(url, data, { headers }).then((res) => {
-      if (res.status === 201) {
+    axios
+      .post(url, data, { headers })
+      .then((res) => {
+        if (res.status === 201) {
+          setLoading(false)
+          alert("登録しました")
+          reset()
+          setShow(false)
+        } else {
+          setLoading(false)
+          alert("登録に失敗しました")
+        }
+      })
+      .catch((e) => {
         setLoading(false)
-        alert("登録しました")
-        reset()
-        setShow(false)
-      } else {
-        setLoading(false)
-        alert("登録に失敗しました")
-      }
-    }).catch((e) => { 
-      setLoading(false)
-      console.error(e)
-    })
+        console.error(e)
+      })
   }
 
   return (
     show && (
-      <div className="fixed top-0 right-0 bg-white w-96 h-full drop-shadow-2xl">
+      <div className="fixed top-0 right-0 bg-white w-96 h-screen drop-shadow-2xl overflow-y-scroll">
         {tokens?.refreshToken ? (
           <>
             <div className="p-4 bg-orange-500 text-white flex justify-between">
@@ -137,39 +138,22 @@ const Sideform = () => {
                     {...register("firstname")}
                   />
                 </div>
-                <div className={blockStyle}>
-                  <label className={labelStyle} htmlFor="phone">
-                    電話番号
-                  </label>
-                  <input
-                    className={inputStyle}
-                    type="text"
-                    {...register("phone")}
-                  />
-                </div>
-                <div className={blockStyle}>
-                  <label className={labelStyle} htmlFor="company">
-                    会社名
-                  </label>
-                  <input
-                    className={inputStyle}
-                    type="text"
-                    {...register("company")}
-                  />
-                </div>
-                <div className={blockStyle}>
-                  <label className={labelStyle} htmlFor="website">
-                    Website
-                  </label>
-                  <input
-                    className={inputStyle}
-                    type="text"
-                    {...register("website")}
-                  />
-                </div>
+                {propertySettings.map((prop) => (
+                  <div className={blockStyle}>
+                    <label className={labelStyle} htmlFor={prop.name}>
+                      {prop.label}
+                    </label>
+                    <input
+                      className={inputStyle}
+                      type={prop.fieldType}
+                      {...register(prop.name)}
+                    />
+                  </div>
+                ))}
                 <input
                   className="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded float-right"
-                  type="submit" disabled={loading}
+                  type="submit"
+                  disabled={loading}
                 />
               </form>
             </div>
