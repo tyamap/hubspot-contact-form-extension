@@ -159,7 +159,7 @@ const Sideform = () => {
             </div>
           </>
         ) : (
-          <>設定からHubSpotにログインしてください</>
+          <p>設定からHubSpotにログインしてください</p>
         )}
       </div>
     )
