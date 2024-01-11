@@ -113,6 +113,10 @@ const Options = () => {
               ["string", "number"].includes(result.type) &&
               !["lastname", "firstname", "email"].includes(result.label)
           )
+          .map((result) => ({
+            ...result,
+            label: viewLabel[result.name] || result.name
+          }))
 
         setProperties(results)
         const result = results.reduce((group, p) => {
@@ -219,3 +223,10 @@ const Options = () => {
 }
 
 export default Options
+
+const viewLabel = {
+  phone: "電話番号",
+  company: "会社名",
+  website: "Website",
+  state: "都道府県/地域",
+}
