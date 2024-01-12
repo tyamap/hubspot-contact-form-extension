@@ -98,11 +98,11 @@ const Options = () => {
           .filter(
             (result) =>
               ["string", "number"].includes(result.type) &&
-              !["lastname", "firstname", "email"].includes(result.label)
+              !["lastname", "firstname", "email"].includes(result.name)
           )
           .map((result) => ({
             ...result,
-            label: viewLabel[result.name] || result.name
+            label: viewLabel[result.name] || result.label
           }))
 
         setProperties(results)
