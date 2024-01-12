@@ -1,7 +1,7 @@
 {
   "name": "sidespot",
   "displayName": "SideSpot - HubSpot contact form extension",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Chrome extension that streamlines the process of creating contact data from a prospective customer's company information, etc.",
   "author": "tyamap",
   "scripts": {
