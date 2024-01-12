@@ -1,22 +1,14 @@
-import axios from "axios";
-import cssText from "data-text:~style.css";
-import type { PlasmoCSConfig } from "plasmo";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
+import axios from "axios"
+import cssText from "data-text:~style.css"
+import type { PlasmoCSConfig } from "plasmo"
+import { useState } from "react"
+import { useForm } from "react-hook-form"
 
+import { useMessage } from "@plasmohq/messaging/hook"
+import { useStorage } from "@plasmohq/storage/hook"
 
-
-import { useMessage } from "@plasmohq/messaging/hook";
-import { useStorage } from "@plasmohq/storage/hook";
-
-
-
-import type { Tokens } from "~entities/tokens";
-import { refreshAuthToken } from "~lib/auth";
-
-
-
-
+import type { Tokens } from "~entities/tokens"
+import { refreshAuthToken } from "~lib/auth"
 
 export const getStyle = () => {
   const style = document.createElement("style")
@@ -138,7 +130,7 @@ const Sideform = () => {
                     {...register("firstname")}
                   />
                 </div>
-                {propertySettings.map((prop) => (
+                {(propertySettings || []).map((prop) => (
                   <div className={blockStyle}>
                     <label className={labelStyle} htmlFor={prop.name}>
                       {prop.label}

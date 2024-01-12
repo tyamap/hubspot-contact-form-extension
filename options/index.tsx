@@ -1,26 +1,13 @@
+import "~/style.css"
 
+import axios from "axios"
+import { useState } from "react"
+import { useForm } from "react-hook-form"
 
+import { useStorage } from "@plasmohq/storage/hook"
 
-import "~/style.css";
-
-
-
-import axios from "axios";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-
-
-
-import { useStorage } from "@plasmohq/storage/hook";
-
-
-
-import type { Tokens } from "~entities/tokens";
-import { refreshAuthToken } from "~lib/auth";
-
-
-
-
+import type { Tokens } from "~entities/tokens"
+import { refreshAuthToken } from "~lib/auth"
 
 type PropertyGroup = {
   [groupName: string]: Property[]
@@ -193,7 +180,7 @@ const Options = () => {
                               className="align-[-2px] mr-1"
                               value={prop.name}
                               {...propsSelectForm.register("props")}
-                              defaultChecked={propertySettings
+                              defaultChecked={(propertySettings || [])
                                 .map((p) => p.name)
                                 .includes(prop.name)}
                             />
@@ -228,5 +215,5 @@ const viewLabel = {
   phone: "電話番号",
   company: "会社名",
   website: "Website",
-  state: "都道府県/地域",
+  state: "都道府県/地域"
 }
