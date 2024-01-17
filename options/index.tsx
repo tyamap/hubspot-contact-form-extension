@@ -1,5 +1,20 @@
 import "~/style.css"
 
+import {
+  closestCenter,
+  DndContext,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent
+} from "@dnd-kit/core"
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy
+} from "@dnd-kit/sortable"
 import axios from "axios"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
@@ -8,6 +23,7 @@ import { useStorage } from "@plasmohq/storage/hook"
 
 import type { Tokens } from "~entities/tokens"
 import { refreshAuthToken } from "~lib/auth"
+import { SortableItem } from "~lib/SortableItem"
 
 type PropertyGroup = {
   [groupName: string]: Property[]
@@ -132,6 +148,27 @@ const Options = () => {
     }
     setPropertySettings(selectedProps)
   }
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates
+    })
+  )
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event
+
+    if (!over) {
+      return
+    }
+
+    if (active.id !== over.id) {
+      const oldIndex = propertySettings.findIndex((v) => v.name === active.id)
+      const newIndex = propertySettings.findIndex((v) => v.name === over.id)
+      const array = arrayMove(propertySettings, oldIndex, newIndex)
+      setPropertySettings(array)
+    }
+  }
 
   return (
     <div
@@ -144,16 +181,26 @@ const Options = () => {
         <div>
           <div className="text-center">認証済み</div>
           {propertySettings && (
-            <>
+            <div className="max-w-xl m-auto">
               <h2>選択済プロパティー</h2>
-              <ul>
-                {propertySettings.map((prop) => (
-                  <li key={prop.name}>{prop.label}</li>
-                ))}
-              </ul>
-            </>
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleDragEnd}>
+                <SortableContext
+                  items={propertySettings}
+                  strategy={verticalListSortingStrategy}>
+                  <div style={{ padding: "1rem" }}>
+                    {propertySettings.map((item) => {
+                      item.id = item.name
+                      return <SortableItem key={item.id} item={item} />
+                    })}
+                  </div>
+                </SortableContext>
+              </DndContext>
+            </div>
           )}
-          <div className="max-w-4xl m-auto">
+          <div className="max-w-xl m-auto">
             {settingProgress ? (
               <form onSubmit={propsSelectForm.handleSubmit(onSubmit)}>
                 <input

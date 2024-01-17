@@ -1,4 +1,5 @@
 type Property = {
+  id: string
   calculated: boolean
   description: string
   displayOrder: number
