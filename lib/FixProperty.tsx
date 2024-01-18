@@ -4,7 +4,7 @@ type Props = {
   name: string
 }
 
-export const FixItem: React.FC<Props> = ({ name }: Props) => {
+export const FixProperty: React.FC<Props> = ({ name }: Props) => {
   const style = {
     border: "1px solid #ddd",
     padding: "0.5rem 1rem",

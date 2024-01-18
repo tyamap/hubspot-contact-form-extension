@@ -7,7 +7,7 @@ type Props = {
   item: Property
 }
 
-export const SortableItem: React.FC<Props> = ({ item }: Props) => {
+export const SortableProperty: React.FC<Props> = ({ item }: Props) => {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id: item.id })
 

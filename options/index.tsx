@@ -23,8 +23,8 @@ import { useStorage } from "@plasmohq/storage/hook"
 
 import type { Tokens } from "~entities/tokens"
 import { refreshAuthToken } from "~lib/auth"
-import { FixItem } from "~lib/FixItem"
-import { SortableItem } from "~lib/SortableItem"
+import { FixProperty } from "~lib/FixProperty"
+import { SortableProperty } from "~lib/SortableProperty"
 
 type PropertyGroup = {
   [groupName: string]: Property[]
@@ -185,9 +185,9 @@ const Options = () => {
             <div className="max-w-xl m-auto">
               <p>ドラッグ&ドロップでプロパティーを並び替えできます。<br/>Email, 姓名は固定です。</p>
               <div className="p-2 flex flex-col gap-2">
-                <FixItem name="Email" />
-                <FixItem name="姓" />
-                <FixItem name="名" />
+                <FixProperty name="Email" />
+                <FixProperty name="姓" />
+                <FixProperty name="名" />
               </div>
               <hr />
               <DndContext
@@ -200,7 +200,7 @@ const Options = () => {
                   <div className="p-2 flex flex-col  gap-2">
                     {propertySettings.map((item) => {
                       item.id = item.name
-                      return <SortableItem key={item.id} item={item} />
+                      return <SortableProperty key={item.id} item={item} />
                     })}
                   </div>
                 </SortableContext>
