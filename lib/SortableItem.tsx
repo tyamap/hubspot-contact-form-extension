@@ -16,7 +16,6 @@ export const SortableItem: React.FC<Props> = ({ item }: Props) => {
     justifyContent: "space-between",
     border: "1px solid #ddd",
     padding: "0.5rem 1rem",
-    marginBottom: "0.5rem",
     backgroundColor: "#fafafa",
     cursor: "move",
     listStyle: "none",
