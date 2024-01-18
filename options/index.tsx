@@ -1,30 +1,30 @@
-import "~/style.css"
 
-import {
-  closestCenter,
-  DndContext,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  type DragEndEvent
-} from "@dnd-kit/core"
-import {
-  arrayMove,
-  SortableContext,
-  sortableKeyboardCoordinates,
-  verticalListSortingStrategy
-} from "@dnd-kit/sortable"
-import axios from "axios"
-import { useState } from "react"
-import { useForm } from "react-hook-form"
 
-import { useStorage } from "@plasmohq/storage/hook"
 
-import type { Tokens } from "~entities/tokens"
-import { refreshAuthToken } from "~lib/auth"
-import { FixProperty } from "~lib/FixProperty"
-import { SortableProperty } from "~lib/SortableProperty"
+import "~/style.css";
+
+
+
+import { closestCenter, DndContext, KeyboardSensor, PointerSensor, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core";
+import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import axios from "axios";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+
+
+
+import { useStorage } from "@plasmohq/storage/hook";
+
+
+
+import type { Tokens } from "~entities/tokens";
+import { refreshAuthToken } from "~lib/auth";
+import { FixProperty } from "~lib/FixProperty";
+import { SortableProperty } from "~lib/SortableProperty";
+
+
+
+
 
 type PropertyGroup = {
   [groupName: string]: Property[]
@@ -39,6 +39,7 @@ const Options = () => {
   const [propertyGroups, setPropertyGroups] = useState<PropertyGroup>({})
   const [properties, setProperties] = useState<Property[]>([])
   const [settingProgress, setSettingProgress] = useState<boolean>(false)
+  const [settingLoading, setSettingLoading] = useState<boolean>(false)
   const propsSelectForm = useForm<{ props: string[] }>()
 
   const handleClickAuth = () => {
@@ -88,7 +89,7 @@ const Options = () => {
 
   const onClick = () => {
     const isExpired = new Date() > new Date(tokens.expiredAt)
-
+    setSettingLoading(true)
     if (isExpired) {
       refreshAuthToken(tokens.refreshToken).then((tokens) => {
         setTokens(tokens)
@@ -131,6 +132,7 @@ const Options = () => {
         console.log(result)
         setPropertyGroups(result)
         setSettingProgress(true)
+        setSettingLoading(false)
       })
       .catch((e) => {
         console.error(e)
@@ -141,13 +143,14 @@ const Options = () => {
     const selectedProps = properties.filter((prop) =>
       data.props.includes(prop.name)
     )
-    console.log(selectedProps)
     if (selectedProps.length > 7) {
       alert(
         `設定できるプロパティーは7個までです。\n選択中: ${selectedProps.length}`
       )
+    } else {
+      setSettingProgress(false)
+      setPropertySettings(selectedProps)
     }
-    setPropertySettings(selectedProps)
   }
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -183,7 +186,11 @@ const Options = () => {
           <div className="text-center">認証済み</div>
           {propertySettings && (
             <div className="max-w-xl m-auto">
-              <p>ドラッグ&ドロップでプロパティーを並び替えできます。<br/>Email, 姓名は固定です。</p>
+              <p>
+                ドラッグ&ドロップでプロパティーを並び替えできます。
+                <br />
+                Email, 姓名は固定です。
+              </p>
               <div className="p-2 flex flex-col gap-2">
                 <FixProperty name="Email" />
                 <FixProperty name="姓" />
@@ -208,18 +215,19 @@ const Options = () => {
             </div>
           )}
           <div className="max-w-xl m-auto">
+            <hr className="mb-2"/>
             {settingProgress ? (
               <form onSubmit={propsSelectForm.handleSubmit(onSubmit)}>
-                <input
-                  type="submit"
-                  value="保存"
-                  className="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded mb-4"
-                />
                 <p>
                   使用するプロパティーを7個まで選択できます。
                   <br />
                   現在設定できるのは文字列・数値タイプのプロパティーのみです🙇‍♂️
                 </p>
+                <input
+                  type="submit"
+                  value="保存"
+                  className="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded my-4 cursor-pointer"
+                />
                 {Object.keys(propertyGroups).map((groupName) => (
                   <div key={groupName || "no_group"}>
                     <h2 className="text-lg font-bold mb-2">
@@ -250,7 +258,8 @@ const Options = () => {
             ) : (
               <button
                 onClick={onClick}
-                className="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded mb-4">
+                className="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded mb-4"
+                disabled={settingLoading}>
                 プロパティーを設定
               </button>
             )}
