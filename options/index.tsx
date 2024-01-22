@@ -1,30 +1,30 @@
+import "~/style.css"
 
+import {
+  closestCenter,
+  DndContext,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent
+} from "@dnd-kit/core"
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy
+} from "@dnd-kit/sortable"
+import axios from "axios"
+import { useState } from "react"
+import { useForm } from "react-hook-form"
 
+import { useStorage } from "@plasmohq/storage/hook"
 
-import "~/style.css";
-
-
-
-import { closestCenter, DndContext, KeyboardSensor, PointerSensor, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core";
-import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from "@dnd-kit/sortable";
-import axios from "axios";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-
-
-
-import { useStorage } from "@plasmohq/storage/hook";
-
-
-
-import type { Tokens } from "~entities/tokens";
-import { refreshAuthToken } from "~lib/auth";
-import { FixProperty } from "~lib/FixProperty";
-import { SortableProperty } from "~lib/SortableProperty";
-
-
-
-
+import type { Tokens } from "~entities/tokens"
+import { deleteRefreshToken, refreshAuthToken } from "~lib/auth"
+import { FixProperty } from "~lib/FixProperty"
+import { SortableProperty } from "~lib/SortableProperty"
 
 type PropertyGroup = {
   [groupName: string]: Property[]
@@ -98,6 +98,18 @@ const Options = () => {
     } else {
       getProperties(tokens.accessToken)
     }
+  }
+
+  const onClickLogout = () => {
+    deleteRefreshToken(tokens.refreshToken).then((res) => {
+      if (res.status === 200) {
+        setTokens(undefined)
+        setPropertySettings([])
+        alert("ログアウトしました")
+      } else {
+        alert("ログアウトに失敗しました")
+      }
+    })
   }
 
   // コンタクトの作成
@@ -183,7 +195,14 @@ const Options = () => {
       }}>
       {tokens?.refreshToken ? (
         <div>
-          <div className="text-center">認証済み</div>
+          <div className="text-right">
+            <button
+              onClick={onClickLogout}
+              className="bg-zinc-400 hover:bg-zinc-500 text-white font-bold py-1 px-2 rounded mb-4"
+              disabled={settingLoading}>
+              ログアウト
+            </button>
+          </div>
           {propertySettings && (
             <div className="max-w-xl m-auto">
               <p>
@@ -266,7 +285,11 @@ const Options = () => {
           </div>
         </div>
       ) : (
-        <button onClick={handleClickAuth}>HubSpot認証</button>
+        <button
+          className="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 my-4 rounded mb-4"
+          onClick={handleClickAuth}>
+          HubSpot認証
+        </button>
       )}
     </div>
   )

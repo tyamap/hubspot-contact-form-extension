@@ -2,7 +2,6 @@ import axios from "axios"
 
 export const refreshAuthToken = (refreshToken) => {
   const url = `${process.env.PLASMO_PUBLIC_API_ROOT}/api/v1/refresh-token`
-  console.log(url, { refresh_token: refreshToken })
   return axios
     .post(url, { refresh_token: refreshToken })
     .then((res) => {
@@ -18,5 +17,14 @@ export const refreshAuthToken = (refreshToken) => {
         accessToken,
         expiredAt: expiredAt.toString()
       })
+    })
+}
+
+export const deleteRefreshToken = (refreshToken) => {
+  const url = `${process.env.PLASMO_PUBLIC_API_ROOT}/api/v1/refresh-token?refresh_token=${refreshToken}`
+  return axios
+    .delete(url)
+    .then((res) => {
+      return (res)
     })
 }
