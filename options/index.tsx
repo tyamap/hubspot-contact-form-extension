@@ -101,15 +101,17 @@ const Options = () => {
   }
 
   const onClickLogout = () => {
-    deleteRefreshToken(tokens.refreshToken).then((res) => {
-      if (res.status === 200) {
-        setTokens(undefined)
-        setPropertySettings([])
-        alert("ログアウトしました")
-      } else {
-        alert("ログアウトに失敗しました")
-      }
-    })
+    if (confirm('選択したプロパティー設定もリセットされます。ログアウトしますか？')) {
+      deleteRefreshToken(tokens.refreshToken).then((res) => {
+        if (res.status === 200) {
+          setTokens(undefined)
+          setPropertySettings([])
+          alert("ログアウトしました")
+        } else {
+          alert("ログアウトに失敗しました")
+        }
+      })
+    }
   }
 
   // コンタクトの作成
