@@ -215,14 +215,14 @@ const Options = () => {
             </div>
           )}
           <div className="max-w-xl m-auto">
-            <hr className="mb-2"/>
+            <hr className="mb-2" />
+            <p>
+              使用するプロパティーを7個まで選択できます。
+              <br />
+              現在設定できるのは文字列・数値タイプのプロパティーのみです🙇‍♂️
+            </p>
             {settingProgress ? (
               <form onSubmit={propsSelectForm.handleSubmit(onSubmit)}>
-                <p>
-                  使用するプロパティーを7個まで選択できます。
-                  <br />
-                  現在設定できるのは文字列・数値タイプのプロパティーのみです🙇‍♂️
-                </p>
                 <input
                   type="submit"
                   value="保存"
@@ -258,7 +258,7 @@ const Options = () => {
             ) : (
               <button
                 onClick={onClick}
-                className="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded mb-4"
+                className="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 my-4 rounded mb-4"
                 disabled={settingLoading}>
                 プロパティーを設定
               </button>
