@@ -1,14 +1,22 @@
-import axios from "axios"
-import cssText from "data-text:~style.css"
-import type { PlasmoCSConfig } from "plasmo"
-import { useState } from "react"
-import { useForm } from "react-hook-form"
+import axios from "axios";
+import cssText from "data-text:~style.css";
+import type { PlasmoCSConfig } from "plasmo";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
 
-import { useMessage } from "@plasmohq/messaging/hook"
-import { useStorage } from "@plasmohq/storage/hook"
 
-import type { Tokens } from "~entities/tokens"
-import { refreshAuthToken } from "~lib/auth"
+
+import { useMessage } from "@plasmohq/messaging/hook";
+import { useStorage } from "@plasmohq/storage/hook";
+
+
+
+import type { Tokens } from "~entities/tokens";
+import { refreshAuthToken } from "~lib/auth";
+
+
+
+
 
 export const getStyle = () => {
   const style = document.createElement("style")
@@ -32,6 +40,7 @@ type ContactInputs = {
 const Sideform = () => {
   const [show, setShow] = useState(false)
   const {
+    getValues,
     register,
     handleSubmit,
     reset,
@@ -59,6 +68,47 @@ const Sideform = () => {
     } else {
       createContact(data, tokens.accessToken)
     }
+  }
+  
+  const onSearch = (data: ContactInputs) => { 
+    const isExpired = new Date() > new Date(tokens.expiredAt)
+  
+    if (isExpired) {
+      refreshAuthToken(tokens.refreshToken).then((tokens) => {
+        setTokens(tokens)
+        searchContact(data, tokens.accessToken)
+      })
+    } else {
+      searchContact(data, tokens.accessToken)
+    }
+  }
+
+  const searchContact = (formData: ContactInputs, accessToken: string) => {
+    if (!formData.email) {
+      alert("Email を入力してください")
+      return
+    }
+    setLoading(true)
+    const url = `${process.env.PLASMO_PUBLIC_API_ROOT}/api/v1/search-contacts`
+    const headers = {
+      "Content-Type": "application/json"
+    }
+    const data = { query: formData.email, accessToken: accessToken }
+    axios
+      .post(url, data, { headers })
+      .then((res) => {
+        if (res.status === 200) {
+          setLoading(false)
+          alert(`${res.data.count}件 該当しました`)
+        } else {
+          setLoading(false)
+          alert("検索に失敗しました")
+        }
+      })
+      .catch((e) => {
+        setLoading(false)
+        console.error(e)
+      })
   }
 
   // コンタクトの作成
@@ -103,12 +153,17 @@ const Sideform = () => {
                   <label className={labelStyle} htmlFor="email">
                     Email
                   </label>
-                  <input
-                    className={inputStyle}
-                    type="email"
-                    {...register("email")}
-                  />
-                  {errors.email && <span>This field is required</span>}
+                  <div className="flex">
+                    <input
+                      required
+                      className={inputStyle}
+                      type="email"
+                      {...register("email")}
+                      />
+                    <button
+                      className="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded w-[72px]"
+                      type="button" onClick={() => onSearch(getValues())}>検索</button>
+                  </div>
                 </div>
                 <div className={blockStyle}>
                   <label className={labelStyle} htmlFor="lastname">
