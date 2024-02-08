@@ -102,15 +102,10 @@ const Options = () => {
 
   const onClickLogout = () => {
     if (confirm('選択したプロパティー設定もリセットされます。ログアウトしますか？')) {
-      deleteRefreshToken(tokens.refreshToken).then((res) => {
-        if (res.status === 200) {
-          setTokens(undefined)
-          setPropertySettings([])
-          alert("ログアウトしました")
-        } else {
-          alert("ログアウトに失敗しました")
-        }
-      })
+      deleteRefreshToken(tokens.refreshToken)
+      setTokens(null)
+      setPropertySettings([])
+      alert("ログアウトしました")
     }
   }
 
