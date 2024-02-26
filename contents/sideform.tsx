@@ -155,7 +155,6 @@ const Sideform = () => {
                   </label>
                   <div className="flex">
                     <input
-                      required
                       className={inputStyle}
                       type="email"
                       {...register("email")}
